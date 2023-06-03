@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logo from "../assets/logo.svg";
-
-export default function Contacts({ contacts, changeChat }) {
+import axios from "axios";
+import { SearchbynameRoute } from "../utils/APIRoutes";
+export default function Contacts({ contacts, changeChat, update }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
+  const [sname, setSname] = useState("");
+  const [scontacts, setScontacts] = useState([]);
   useEffect(async () => {
     const data = await JSON.parse(
       localStorage.getItem("chat-key")
@@ -13,6 +17,23 @@ export default function Contacts({ contacts, changeChat }) {
     setCurrentUserName(data.username);
     setCurrentUserImage(data.avatarImage);
   }, []);
+
+  // console.log(contacts);
+  const searchName = async (e) => {
+    e.persist();
+    const nam = e.target.value;
+    setTimeout(async () => {
+      setSname(nam);
+      const { data } = await axios.post(SearchbynameRoute, {
+        sname: sname
+      });
+      setScontacts(data.sdata);
+      // console.log(scontacts.length);
+      // console.log(contacts);
+    }, 1);
+    console.log(sname);
+  }
+
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
     changeChat(contact);
@@ -22,31 +43,64 @@ export default function Contacts({ contacts, changeChat }) {
       {currentUserImage && currentUserImage && (
         <Container>
           <div className="brand">
-            {/* <img src={Logo} alt="logo" /> */}
             <h3>E-CHATT</h3>
           </div>
-          <div className="contacts">
-            {contacts.map((contact, index) => {
-              return (
-                <div
-                  key={contact._id}
-                  className={`contact ${index === currentSelected ? "selected" : ""
-                    }`}
-                  onClick={() => changeCurrentChat(index, contact)}
-                >
-                  <div className="avatar">
-                    <img
-                      src={`data:image/svg+xml;base64,${contact.avatarImage}`}
-                      alt=""
-                    />
-                  </div>
-                  <div className="username">
-                    <h3>{contact.username}</h3>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="search-box" style={{ position: "relative", display: "flex", justifyContent: "center", marginBottom: '5px' }} >
+            <input type="text" onChange={searchName} value={sname} placeholder="search by name and add ' . ' in last" style={{ height: "100%", width: "90%" }} />
           </div>
+          {scontacts && scontacts.length > 0 ? (
+            <div className="contacts">
+              {
+                scontacts.map((contact, index) => {
+                  return (
+                    <div
+                      key={contact._id}
+                      className={`contact ${index === currentSelected ? "selected" : ""
+                        }`}
+                      onClick={() => changeCurrentChat(index, contact)}
+                    >
+                      <div className="avatar">
+                        <img
+                          src={`data:image/svg+xml;base64,${contact.avatarImage}`}
+                          alt=""
+                        />
+                      </div>
+                      <div className="username">
+                        <h3>{contact.username}</h3>
+                      </div>
+                    </div>
+                  );
+                })
+              }
+            </div>
+          ) : (
+            <div className="contacts">
+              {
+                contacts.map((contact, index) => {
+                  return (
+                    <div
+                      key={contact._id}
+                      className={`contact ${index === currentSelected ? "selected" : ""
+                        }`}
+                      onClick={() => changeCurrentChat(index, contact)}
+                    >
+                      <div className="avatar">
+                        <img
+                          src={`data:image/svg+xml;base64,${contact.avatarImage}`}
+                          alt=""
+                        />
+                      </div>
+                      <div className="username">
+                        <h3>{contact.username}</h3>
+                      </div>
+                    </div>
+                  );
+                })
+              }
+            </div>
+          )
+          }
+
           <div className="current-user">
             <div className="avatar">
               <img
@@ -65,7 +119,7 @@ export default function Contacts({ contacts, changeChat }) {
 }
 const Container = styled.div`
   display: grid;
-  grid-template-rows: 10% 75% 15%;
+  grid-template-rows: 10% 7% 65% 15%;
   overflow: hidden;
   background-color: #080420;
   .brand {
@@ -84,6 +138,7 @@ const Container = styled.div`
   .contacts {
     display: flex;
     flex-direction: column;
+    align-self:flex-start;
     align-items: center;
     overflow: auto;
     gap: 0.8rem;
@@ -97,7 +152,7 @@ const Container = styled.div`
     }
     .contact {
       background-color: #ffffff34;
-      min-height: 5rem;
+      min-height: 3rem;
       cursor: pointer;
       width: 90%;
       border-radius: 0.2rem;

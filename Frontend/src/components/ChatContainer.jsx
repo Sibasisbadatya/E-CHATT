@@ -90,9 +90,8 @@ export default function ChatContainer({ currentChat, socket }) {
           return (
             <div ref={scrollRef} key={uuidv4()}>
               <div
-                className={`message ${
-                  message.fromSelf ? "sended" : "recieved"
-                }`}
+                className={`message ${message.fromSelf ? "sended" : "recieved"
+                  }`}
               >
                 <div className="content ">
                   <p>{message.message}</p>
@@ -118,6 +117,7 @@ const Container = styled.div`
   .chat-header {
     display: flex;
     justify-content: space-between;
+    box-sizing:border-box;
     align-items: center;
     padding: 0 2rem;
     .user-details {
