@@ -85,3 +85,18 @@ module.exports.logOut = (req, res, next) => {
     next(ex);
   }
 };
+module.exports.Searchbyname = async (req, res, next) => {
+  try {
+    console.log(req.body);
+    const { sname } = req.body;
+    if (!sname)
+      return res.json({ msg: "User id is required " });
+    else {
+      const sdata = await User.find({ username: sname });
+      console.log(sdata);
+      return res.json({ sdata });
+    }
+  } catch (ex) {
+    next(ex);
+  }
+};
