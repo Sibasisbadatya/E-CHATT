@@ -1,0 +1,22 @@
+/* height:2rem;
+width:2rem */
+.open {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    height: 2rem;
+    width: 2rem;
+    visibility: hidden;
+}
+
+.open>.openimg {
+    cursor: pointer;
+    height: 2rem;
+    width: 2rem;
+}
+
+@media screen and (max-width:460px) {
+    .open {
+        visibility: visible;
+    }
+}
