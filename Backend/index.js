@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 mongoose
-  .connect("mongodb+srv://sibasisbadatya:sFYJPWIq6oeRqdoP@cluster0.l9tcktf.mongodb.net/?retryWrites=true&w=majority", {
+  .connect("mongodb+srv://sibasisbadatya:invFRhy5KVmy12RE@cluster0.1k2qrqp.mongodb.net/?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -30,7 +30,7 @@ const server = app.listen(8000, () =>
 );
 const io = socket(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     credentials: true,
   },
 });
