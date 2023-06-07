@@ -9,7 +9,7 @@ require("dotenv").config();
 
 app.use(cors());
 app.use(express.json());
-
+app.use("/images", express.static('images'));
 mongoose
   .connect("mongodb+srv://sibasisbadatya:invFRhy5KVmy12RE@cluster0.1k2qrqp.mongodb.net/?retryWrites=true&w=majority", {
     useNewUrlParser: true,
@@ -45,7 +45,9 @@ io.on("connection", (socket) => {
   socket.on("send-msg", (data) => {
     const sendUserSocket = onlineUsers.get(data.to);
     if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msg-recieve", data.msg);
-    }
+      const msg = data.msg;
+      const img = data.image;
+      socket.to(sendUserSocket).emit("msg-recieve", { msg, img });
+}
   });
 });
