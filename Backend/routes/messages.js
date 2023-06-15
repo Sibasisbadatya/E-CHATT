@@ -34,7 +34,7 @@ router.route('/addmsg').post(upload.single('photo'), async (req, res) => {
         const to = req.body.to;
         const message = req.body.message;
         let photo;
-        console.log(message);
+        // console.log(message);
         if (!message) {
             photo = req.file.filename;
         }
@@ -48,7 +48,7 @@ router.route('/addmsg').post(upload.single('photo'), async (req, res) => {
         });
         const pic = await Messages.find({ sender: from });
         if (pic) {
-            console.log(pic[pic.length - 1].photo);
+            // console.log(pic[pic.length - 1].photo);
             return res.json({ pic: pic[pic.length - 1].photo })
         }
         if (data) return res.json({ msg: "Message added successfully." });

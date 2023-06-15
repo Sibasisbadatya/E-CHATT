@@ -21,15 +21,15 @@ export default function Contacts({ contacts, changeChat, update }) {
   // console.log(contacts);
   const searchName = async (e) => {
     e.persist();
+    console.log(e.target.value);
     const nam = e.target.value;
-    setTimeout(async () => {
+    // setTimeout(async () => {
       setSname(nam);
       const { data } = await axios.post(SearchbynameRoute, {
-        sname: sname
+        sname: e.target.value
       });
       setScontacts(data.sdata);
-    }, 1);
-    console.log(sname);
+
   }
 
   const changeCurrentChat = (index, contact) => {

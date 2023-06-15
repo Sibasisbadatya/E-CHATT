@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 
 module.exports.login = async (req, res, next) => {
   try {
-    console.log("yes");
+    // console.log("yes");
     const { username, password } = req.body;
     const user = await User.findOne({ username });
     if (!user)
@@ -20,7 +20,7 @@ module.exports.login = async (req, res, next) => {
 
 module.exports.register = async (req, res, next) => {
   try {
-    console.log("yes register");
+    // console.log("yes register");
     const { username, email, password } = req.body;
     const usernameCheck = await User.findOne({ username });
     if (usernameCheck)
@@ -87,13 +87,14 @@ module.exports.logOut = (req, res, next) => {
 };
 module.exports.Searchbyname = async (req, res, next) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const { sname } = req.body;
+    console.log(sname);
     if (!sname)
-      return res.json({ msg: "User id is required " });
+      return res.json([]);
     else {
       const sdata = await User.find({ username: sname });
-      console.log(sdata);
+      console.log(sdata.length);
       return res.json({ sdata });
     }
   } catch (ex) {
