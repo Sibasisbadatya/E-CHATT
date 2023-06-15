@@ -28,8 +28,6 @@ export default function Contacts({ contacts, changeChat, update }) {
         sname: sname
       });
       setScontacts(data.sdata);
-      // console.log(scontacts.length);
-      // console.log(contacts);
     }, 1);
     console.log(sname);
   }

@@ -43,7 +43,6 @@ export default function ChatContainer({ currentChat, socket }) {
     formData.append('to', currentChat._id);
     formData.append('message', msg);
     const pic = await axios.post(sendMessageRoute, formData);
-    // console.log(pic.data.pic);
     socket.current.emit("send-msg", {
       to: currentChat._id,
       from: data._id,
@@ -51,7 +50,7 @@ export default function ChatContainer({ currentChat, socket }) {
       image: pic.data.pic
     });
     const msgs = [...messages];
-    msgs.push({ fromSelf: true, message: msg, image: pic.data.pic });
+     msgs.push({ fromSelf: true, message: msg, image: pic.data.pic });
     setMessages(msgs);
   };
   const handleImage = (data) => {
