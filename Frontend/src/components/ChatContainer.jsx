@@ -3,11 +3,14 @@ import styled from "styled-components";
 import ChatInput from "./ChatInput";
 import Logout from "./Logout";
 import { v4 as uuidv4 } from "uuid";
+import loader from "../assets/loader.gif";
 import axios from "axios";
-import { sendMessageRoute, recieveMessageRoute } from "../utils/APIRoutes";
+import { sendMessageRoute, recieveMessageRoute, downloadFileRoute } from "../utils/APIRoutes";
 import { host } from "../utils/APIRoutes";
 export default function ChatContainer({ currentChat, socket }) {
   const [messages, setMessages] = useState([]);
+  const [isPic, setIsPic] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [image, setImage] = useState('');
@@ -19,7 +22,9 @@ export default function ChatContainer({ currentChat, socket }) {
       from: data._id,
       to: currentChat._id,
     });
+    // console.log("responce", response.data);
     setMessages(response.data);
+    setIsLoading(false);
   }, [currentChat]);
 
   useEffect(() => {
@@ -32,7 +37,9 @@ export default function ChatContainer({ currentChat, socket }) {
     };
     getCurrentChat();
   }, [currentChat]);
-
+  const setPic = () => {
+    setIsPic(true);
+  }
   const handleSendMsg = async (msg) => {
     const data = await JSON.parse(
       localStorage.getItem("chat-key")
@@ -42,24 +49,31 @@ export default function ChatContainer({ currentChat, socket }) {
     formData.append('from', data._id);
     formData.append('to', currentChat._id);
     formData.append('message', msg);
-    const pic = await axios.post(sendMessageRoute, formData);
+    setIsLoading(true);
+    const pic = await axios.post(sendMessageRoute, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    setIsLoading(false);
     socket.current.emit("send-msg", {
       to: currentChat._id,
       from: data._id,
       msg,
-      image: pic.data.pic
+      image: pic.data.pic,
+      type: pic.data.type,
+      Oname: pic.data.Oname
     });
     const msgs = [...messages];
-     msgs.push({ fromSelf: true, message: msg, image: pic.data.pic });
+    msgs.push({ fromSelf: true, message: msg, image: pic.data.pic, type: pic.data.type, Oname: pic.data.Oname });
     setMessages(msgs);
   };
   const handleImage = (data) => {
     setImage(data);
   }
+  console.log(messages);
   useEffect(() => {
     if (socket.current) {
       socket.current.on("msg-recieve", (data) => {
-        setArrivalMessage({ fromSelf: false, message: data.msg, image: data.img });
+        setArrivalMessage({ fromSelf: false, message: data.msg, image: data.img, type: data.type, Oname: data.Oname });
       });
     }
   }, []);
@@ -72,42 +86,77 @@ export default function ChatContainer({ currentChat, socket }) {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const downloadFile = async (data) => {
+    // data.preventDefault();
+    // console.log("yes");
+    console.log(data);
+    const response = await axios.get(`${downloadFileRoute}/${data}`);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = `${downloadFileRoute}/${data}`;
+    downloadLink.download = data;
+    downloadLink.click();
+  }
+
   return (
-    <Container>
-      <div className="chat-header">
-        <div className="user-details">
-          <div className="avatar">
-            <img
-              src={`data:image/svg+xml;base64,${currentChat.avatarImage}`}
-              alt=""
-            />
-          </div>
-          <div className="username">
-            <h3>{currentChat.username}</h3>
-          </div>
-        </div>
-        <Logout />
-      </div>
-      <div className="chat-messages">
-        {messages.map((message) => {
-          return (
-            <div ref={scrollRef} key={uuidv4()}>
-              <div
-                className={`message ${message.fromSelf ? "sended" : "recieved"
-                  }`}
-              >
-                <div className="content ">
-                  <p>{message.message}</p>
-                  {message.image ? (<img className="content-image" src={`${host}/images/${message.image}`}></img>) : ("")}
+    <>
+      {
+        isLoading && isPic ?
+          (
+            <Container>
+              <b style={{ color: "yellow", top: "30vh", margin: "auto" }}>Loading ...</b>
+            </Container>
+          )
+          :
+          (
+            < Container >
+              <div className="chat-header">
+                <div className="user-details">
+                  <div className="avatar">
+                    <img
+                      src={`data:image/svg+xml;base64,${currentChat.avatarImage}`}
+                      alt=""
+                    />
+                  </div>
+                  <div className="username">
+                    <h3>{currentChat.username}</h3>
+                  </div>
                 </div>
+                <Logout />
               </div>
-            </div>
-          );
-        })}
-        <div ref={scrollRef} key={uuidv4()}></div>
-      </div>
-      <ChatInput handleSendMsg={handleSendMsg} handleImage={handleImage} />
-    </Container>
+              <div className="chat-messages">
+                {messages.map((message) => {
+                  return (
+                    <div ref={scrollRef} key={uuidv4()}>
+                      <div
+                        className={`message ${message.fromSelf ? "sended" : "recieved"
+                          }`}
+                      >
+                        <div className="content ">
+                          <p>{message.message}</p>
+                          {message.type == "image/jpeg" ? (
+                            <>
+                              <img className="content-image" src={`${message.image}`}></img>
+                            </>
+                          ) : (
+                            <>
+                              <div style={{ height: "50px", width: "300px" }}>
+                                <span>{message.Oname}</span><br></br>
+                                <button onClick={() => downloadFile(message.Oname)} >Download</button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={scrollRef} key={uuidv4()}></div>
+              </div>
+              <ChatInput handleSendMsg={handleSendMsg} handleImage={handleImage} setpic={setPic} />
+            </ Container>
+          )
+      }
+    </>
   );
 }
 

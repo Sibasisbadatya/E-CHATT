@@ -47,7 +47,9 @@ io.on("connection", (socket) => {
     if (sendUserSocket) {
       const msg = data.msg;
       const img = data.image;
-      socket.to(sendUserSocket).emit("msg-recieve", { msg, img });
-}
+      const type = data.type;
+      const Oname=data.Oname;
+      socket.to(sendUserSocket).emit("msg-recieve", { msg, img ,type,Oname});
+    }
   });
 });

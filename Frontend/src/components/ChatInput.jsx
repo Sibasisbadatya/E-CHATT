@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-export default function ChatInput({ handleSendMsg, handleImage }) {
+export default function ChatInput({ handleSendMsg, handleImage, setpic }) {
   const toastOptions = {
     position: "bottom-right",
     autoClose: "5000",
@@ -31,6 +31,7 @@ export default function ChatInput({ handleSendMsg, handleImage }) {
     }
   };
   const handlePhoto = (e) => {
+    setpic();
     console.log(e.target.files[0]);
     setPhoto(e.target.files[0]);
     setImgbtn(e.target.files[0].name);
@@ -46,7 +47,7 @@ export default function ChatInput({ handleSendMsg, handleImage }) {
   return (
     <Container>
       <form className="input-container" onSubmit={(event) => sendChat(event)} encType='multipart/form-data'>
-        <input type="file" accept="image/*" onChange={handlePhoto} ref={fileInputRef} style={{ display: 'none' }} />
+        <input type="file" onChange={handlePhoto} ref={fileInputRef} style={{ display: 'none' }} />
         <div className="imgclick" onClick={handleChooseImage}><span>{imgbtn}</span></div>
         <input
           type="text"

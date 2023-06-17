@@ -13,6 +13,12 @@ const MessageSchema = mongoose.Schema(
     },
     photo: {
       type: String
+    },
+    type: {
+      type: String
+    },
+    Oname: {
+      type: String
     }
   },
   {
